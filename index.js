@@ -1,11 +1,13 @@
 const TelegramBot = require("node-telegram-bot-api");
 const dotenv = require("dotenv");
+const axios = require('axios');
+
 dotenv.config();
 
 const token = process.env.BOT_TOKEN;
 const kippo = new TelegramBot(token, { polling: true });
 
-kippo.onText(/\/test/, (msg) => {
+kippo.onText(/\/help/, (msg) => {
   kippo.sendMessage(msg.chat.id, `What would you like to know?`, {
     reply_markup: {
       keyboard: [
@@ -34,10 +36,7 @@ kippo.on("message", (msg) => {
       break;
     case option.video:
       // latest video
-      kippo.sendMessage(
-        msg.chat.id,
-        "https://youtu.be/OwgM5N_fJ9k",
-      );
+      kippo.sendMessage(msg.chat.id, "https://youtu.be/OwgM5N_fJ9k");
       break;
     case option.watchList:
       kippo.sendMessage(
@@ -58,7 +57,7 @@ kippo.on("message", (msg) => {
       // cancel
       kippo.sendMessage(
         msg.chat.id,
-        `Thank you for choosing our service, ${msg.chat?.first_name}!`
+        `Thank you for choosing our service, ${msg.from?.first_name}!`
       );
       break;
   }
