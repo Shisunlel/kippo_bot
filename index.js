@@ -1,9 +1,9 @@
 const TelegramBot = require("node-telegram-bot-api");
-const dotenv = require("dotenv");
+// const dotenv = require("dotenv");
 const axios = require("axios");
 const dayjs = require('dayjs')
 
-dotenv.config();
+// dotenv.config();
 
 const token = process.env.BOT_TOKEN;
 const api = process.env.API
