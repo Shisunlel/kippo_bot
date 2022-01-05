@@ -1,12 +1,14 @@
 const TelegramBot = require("node-telegram-bot-api");
 // const dotenv = require("dotenv");
 const axios = require("axios");
-const dayjs = require('dayjs')
+const dayjs = require("dayjs");
 
 // dotenv.config();
 
 const token = process.env.BOT_TOKEN;
-const api = process.env.API
+const youtubeToken = process.env.YOUTUBE_TOKEN;
+const api = process.env.API;
+const youtubeApi = process.env.YOUTUBE_API;
 const kippo = new TelegramBot(token, { polling: true });
 
 kippo.onText(/\/help/, (msg) => {
@@ -42,8 +44,14 @@ kippo.on("message", (msg) => {
         const paydate = new Date(`${data.payment_date}`).toLocaleDateString(
           "km-KH"
         );
-        const forMonth = dayjs(`${data.payment_for}`).format('MMMM/YYYY')
-        const template = `<b>ថ្ងៃបង់ប្រាក់: ${paydate}</b>\n\n<em>សម្រាប់ខែ: ${forMonth}</em>\n\nលេខបន្ទប់: ${data.rooms_id}\n\nភ្លើង: ${toKHR(data.energy_cost)}៛\n\nទឹក: ${toKHR(data.water_cost)}៛\n\nសរុបជាលុយខ្មែរ: ${toKHR(data.total_amount_kh)}៛\n\nសរុបជាដុល្លារ: $${toUSD(data.total_amount_us)}`;
+        const forMonth = dayjs(`${data.payment_for}`).format("MMMM/YYYY");
+        const template = `<b>ថ្ងៃបង់ប្រាក់: ${paydate}</b>\n\n<em>សម្រាប់ខែ: ${forMonth}</em>\n\nលេខបន្ទប់: ${
+          data.rooms_id
+        }\n\nភ្លើង: ${toKHR(data.energy_cost)}៛\n\nទឹក: ${toKHR(
+          data.water_cost
+        )}៛\n\nសរុបជាលុយខ្មែរ: ${toKHR(
+          data.total_amount_kh
+        )}៛\n\nសរុបជាដុល្លារ: $${toUSD(data.total_amount_us)}`;
         if (data.id) {
           kippo.sendMessage(msg.chat.id, template, {
             parse_mode: mode,
@@ -53,7 +61,11 @@ kippo.on("message", (msg) => {
       break;
     case option.video:
       // latest video
-      kippo.sendMessage(msg.chat.id, "https://youtu.be/OwgM5N_fJ9k");
+      const youtubeVideo = getLatestVideo();
+      youtubeVideo.then((data) => {
+        const uri = `https://youtube.com/watch?v=${data.items[0]?.id?.videoId}`
+        kippo.sendMessage(msg.chat.id, uri);
+      });
       break;
     case option.watchList:
       kippo.sendMessage(
@@ -89,11 +101,27 @@ async function getRecord() {
   }
 }
 
-
-function toKHR(val){
-  return Number(val).toLocaleString(undefined, {minimumFractionDigits: 0})
+async function getLatestVideo() {
+  const params = {
+    part: "snippet",
+    channelId: "UCO7ByfyndHuYKrauMEbBRVQ",
+    order: "date",
+    type: "video",
+    key: youtubeToken,
+    maxResults: 1,
+  };
+  try {
+    const res = await axios.get(`${youtubeApi}/search`, { params });
+    return res.data;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-function toUSD(val){
-  return Number(val).toLocaleString(undefined, {minimumFractionDigits: 2})
+function toKHR(val) {
+  return Number(val).toLocaleString(undefined, { minimumFractionDigits: 0 });
+}
+
+function toUSD(val) {
+  return Number(val).toLocaleString(undefined, { minimumFractionDigits: 2 });
 }
