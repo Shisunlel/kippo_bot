@@ -113,7 +113,7 @@ async function trySwitch(option, res, msg) {
     case option.contact.test(res):
       kippo.sendMessage(
         msg.chat.id,
-        `You can contact us by through one of these phone numbers\n\n[+85578266598]\n\n[+85598266598]\n\n[+85592422556]`,
+        `ទំនាក់ទំនងតាមលេខទូរស័ព្ទខាងក្រោមនេះ\n\n[+85578266598]\n\n[+85598266598]\n\n[+85592422556]`,
         {
           parse_mode: "Markdown"
         }
@@ -123,7 +123,7 @@ async function trySwitch(option, res, msg) {
     case option.processPayment.test(res):
       kippo.sendMessage(
         msg.chat.id,
-        "តើអ្នកស្នាក់នៅបន្ទប់លេខប៉ុន្មាន?\n\nex: <b><i>r-10</i></b>",
+        "តើអ្នកស្នាក់នៅបន្ទប់លេខប៉ុន្មាន?(សូមគោរពតាមឧទាហរណ៍ខាងក្រោម)\n\nex: <b><i>r-10</i></b>",
         { parse_mode: "HTML" }
       );
       break;
