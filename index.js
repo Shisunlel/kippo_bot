@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const axios = require("axios");
 const dayjs = require("dayjs");
 const app = express()
-const port = 3000
+const port = 80
 
 dotenv.config();
 
@@ -129,11 +129,6 @@ function toUSD(val) {
   return Number(val).toLocaleString(undefined, { minimumFractionDigits: 2 });
 }
 
-app.get('/', (req, res) => {
-  return res.send('Hello');
-})
-
-
-app.listen(port, () => {
+app.listen(process.env.PORT || port, () => {
   console.log('app is listening on port ' + port)
 })
