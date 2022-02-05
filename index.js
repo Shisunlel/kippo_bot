@@ -1,10 +1,10 @@
-const express = require('express')
+const express = require("express");
 const TelegramBot = require("node-telegram-bot-api");
 const dotenv = require("dotenv");
 const axios = require("axios");
 const dayjs = require("dayjs");
-const app = express()
-const port = 80
+const app = express();
+const port = 3000;
 
 dotenv.config();
 
@@ -14,16 +14,23 @@ const api = process.env.API;
 const youtubeApi = process.env.YOUTUBE_API;
 const kippo = new TelegramBot(token, { polling: true });
 
-kippo.onText(/\/help/, (msg) => {
-  kippo.sendMessage(msg.chat.id, `What would you like to know?`, {
+let room_id, room_data, new_energy, new_water;
+
+kippo.onText(/\/start/, (msg) => {
+  const myChatId = 306355505;
+  let keyboard;
+  if (msg.chat.id == myChatId) {
+    keyboard = [
+      ["Process Payment", "Get Latest Payments"],
+      ["Get Latest Upload Video", "Get Watch List", "Get Best Anime"],
+      ["Cancel"],
+    ];
+  } else {
+    keyboard = [["Process Payment"], ["Cancel"]];
+  }
+  kippo.sendMessage(msg.chat.id, `What would you like to do?`, {
     reply_markup: {
-      keyboard: [
-        ["Get Latest Payments"],
-        ["Get Latest Upload Video"],
-        ["Get Watch List"],
-        ["Get Best Anime"],
-        ["Cancel"],
-      ],
+      keyboard,
       one_time_keyboard: true,
     },
   });
@@ -32,67 +39,18 @@ kippo.onText(/\/help/, (msg) => {
 kippo.on("message", (msg) => {
   // console.log(msg.chat.id)
   const option = {
-    payments: "get-latest-payments",
-    video: "get-latest-upload-video",
-    watchList: "get-watch-list",
-    bestAnime: "get-best-anime",
+    processPayment: /process-payment/,
+    payments: /get-latest-payments/,
+    video: /get-latest-upload-video/,
+    watchList: /get-watch-list/,
+    bestAnime: /get-best-anime/,
+    room: /r-\d+/,
+    energy: /e-\d+/,
+    water: /w-\d+/,
+    cancel: /cancel/,
   };
   const res = msg.text.toString().toLowerCase().replace(/ /g, "-");
-  switch (res) {
-    case option.payments:
-      // latest sales
-      const res = getRecord();
-      res.then((data) => {
-        const mode = "HTML";
-        const paydate = new Date(`${data.payment_date}`).toLocaleDateString(
-          "km-KH"
-        );
-        const forMonth = dayjs(`${data.payment_for}`).format("MMMM/YYYY");
-        const template = `<b>ថ្ងៃបង់ប្រាក់: ${paydate}</b>\n\n<em>សម្រាប់ខែ: ${forMonth}</em>\n\nលេខបន្ទប់: ${
-          data.rooms_id
-        }\n\nភ្លើង: ${toKHR(data.energy_cost)}៛\n\nទឹក: ${toKHR(
-          data.water_cost
-        )}៛\n\nសរុបជាលុយខ្មែរ: ${toKHR(
-          data.total_amount_kh
-        )}៛\n\nសរុបជាដុល្លារ: $${toUSD(data.total_amount_us)}`;
-        if (data.id) {
-          kippo.sendMessage(msg.chat.id, template, {
-            parse_mode: mode,
-          });
-        }
-      });
-      break;
-    case option.video:
-      // latest video
-      const youtubeVideo = getLatestVideo();
-      youtubeVideo.then((data) => {
-        const uri = `https://youtube.com/watch?v=${data.items[0]?.id?.videoId}`
-        kippo.sendMessage(msg.chat.id, uri);
-      });
-      break;
-    case option.watchList:
-      kippo.sendMessage(
-        msg.chat.id,
-        "[WatchList](https://anilist.co/user/Shisun/animelist/Watching)",
-        { parse_mode: "MarkdownV2" }
-      );
-      // watch list
-      break;
-    case option.bestAnime:
-      // best anime
-      kippo.sendMessage(
-        msg.chat.id,
-        "https://anilist.co/anime/105333/dr-stone"
-      );
-      break;
-    case "cancel":
-      // cancel
-      kippo.sendMessage(
-        msg.chat.id,
-        `Thank you for choosing our service, ${msg.from?.first_name}!`
-      );
-      break;
-  }
+  trySwitch(option, res, msg);
 });
 
 async function getRecord() {
@@ -100,7 +58,18 @@ async function getRecord() {
     const res = await axios.get(`${api}/record`);
     return res.data;
   } catch (error) {
-    console.error(error);
+    console.log(error);
+  }
+}
+
+async function getLatestRecordByRoom(room_id) {
+  try {
+    const res = await axios.get(
+      `${api}/${room_id}`
+    );
+    return res.data;
+  } catch (error) {
+    throw error;
   }
 }
 
@@ -121,6 +90,161 @@ async function getLatestVideo() {
   }
 }
 
+async function trySwitch(option, res, msg) {
+  switch (true) {
+    case option.payments.test(res):
+      // latest sales
+      const response = getRecord();
+      response.then((data) => {
+        const mode = "HTML";
+        const paydate = new Date(`${data.payment_date}`).toLocaleDateString(
+          "km-KH"
+        );
+        const forMonth = dayjs(`${data.payment_for}`).format("MMMM/YYYY");
+        const template = `<b>ថ្ងៃបង់ប្រាក់: ${paydate}</b>\n\n<em>សម្រាប់ខែ: ${forMonth}</em>\n\nលេខបន្ទប់: ${
+          data.rooms_id
+        }\n\nភ្លើង: ${toKHR(data.energy_cost)}៛\n\nទឹក: ${toKHR(
+          data.water_cost
+        )}៛\n\nសរុបជាលុយខ្មែរ: ${toKHR(
+          data.total_amount_kh
+        )}៛\n\nសរុបជាដុល្លារ: $${toUSD(data.total_amount_us)}`;
+        if (data.id) {
+          kippo.sendMessage(msg.chat.id, template, {
+            parse_mode: mode,
+          });
+        }
+      });
+      break;
+    case option.video.test(res):
+      // latest video
+      const youtubeVideo = getLatestVideo();
+      youtubeVideo.then((data) => {
+        const uri = `https://youtube.com/watch?v=${data.items[0]?.id?.videoId}`;
+        kippo.sendMessage(msg.chat.id, uri);
+      });
+      break;
+    case option.watchList.test(res):
+      kippo.sendMessage(
+        msg.chat.id,
+        "[WatchList](https://anilist.co/user/Shisun/animelist/Watching)",
+        { parse_mode: "MarkdownV2" }
+      );
+      // watch list
+      break;
+    case option.bestAnime.test(res):
+      // best anime
+      kippo.sendMessage(
+        msg.chat.id,
+        "https://anilist.co/anime/105333/dr-stone"
+      );
+      break;
+    case option.cancel.test(res):
+      // cancel
+      kippo.sendMessage(
+        msg.chat.id,
+        `Thank you for choosing our service, ${msg.from?.first_name}!`
+      );
+      break;
+
+    case option.processPayment.test(res):
+      kippo.sendMessage(
+        msg.chat.id,
+        "តើអ្នកស្នាក់នៅបន្ទប់លេខប៉ុន្មាន?\n\nex: <b><i>r-10</i></b>",
+        { parse_mode: "HTML" }
+      );
+      break;
+    case option.room.test(res):
+      room_id = res.slice(2);
+      try {
+        room_data = await getLatestRecordByRoom(room_id);
+        if (room_data) {
+          kippo.sendMessage(
+            msg.chat.id,
+            `សូមបញ្ចូលគីឡូភ្លើងខែថ្មី\n\nគីឡូភ្លើងខែចាស់: <b>${room_data.new_energy}\n\n</b>ex: <b><i>e-253</i></b>`,
+            { parse_mode: "HTML" }
+          );
+        }
+      } catch (error) {
+        kippo.sendMessage(
+          msg.chat.id,
+          `${error.response.statusText || "Room Not Found"} `
+        );
+      }
+      break;
+    case option.energy.test(res):
+      if (room_data) {
+        new_energy = res.slice(2);
+        if (room_data && new_energy >= room_data.new_energy) {
+          kippo.sendMessage(
+            msg.chat.id,
+            `សូមបញ្ចូលចំនួនទឹកខែថ្មី\n\nលេខទឹកខែចាស់: <b>${room_data.new_water}</b>\n\nex: <b><i>w-21</i></b>`,
+            { parse_mode: "HTML" }
+          );
+        } else {
+          kippo.sendMessage(
+            msg.chat.id,
+            `សូមបញ្ចូលម្តងទៀត\n\nគីឡូភ្លើងខែចាស់: <b>${room_data.new_energy}</b>\n\nex: <b><i>w-21</i></b>`,
+            { parse_mode: "HTML" }
+          );
+        }
+      }
+
+      break;
+    case option.water.test(res):
+      if (room_data) {
+        new_water = res.slice(2);
+        if (room_data && new_water >= room_data.new_water) {
+          const postData = {
+            room_id: Number(room_id),
+            old_energy: room_data.new_energy,
+            new_energy: Number(new_energy),
+            old_water: room_data.new_water,
+            new_water: Number(new_water),
+            chat_id: msg.chat.id,
+          };
+          const data = await createRecord(postData);
+          if (data) {
+            kippo.sendMediaGroup(msg.chat.id, [
+              {
+                type: "photo",
+                media:
+                  "https://res.cloudinary.com/shisun/image/upload/v1644070857/photo_2022-02-05_21-19-06_p2ycrx.jpg",
+                caption: "ABA: <i>078 266 598</i>\n\nABA: <i>001 132 178</i>",
+                parse_mode: "HTML",
+              },
+              {
+                type: "photo",
+                media:
+                  "https://res.cloudinary.com/shisun/image/upload/v1644072258/photo_2022-02-05_21-43-57_qw5ds9.jpg",
+                caption: "Canadia: <i>006 000 025 7845</i>",
+                parse_mode: "HTML",
+              },
+            ]);
+          }
+          kippo.sendMessage(msg.chat.id, `សូមអរគុណ!`, { parse_mode: "HTML" });
+        } else {
+          kippo.sendMessage(
+            msg.chat.id,
+            `សូមបញ្ចូលម្តងទៀត\n\nលេខទឹកខែចាស់: <b>${room_data.new_water}</b>\n\nex: <b><i>w-21</i></b>`,
+            { parse_mode: "HTML" }
+          );
+        }
+      }
+  }
+}
+
+async function createRecord(data) {
+  try {
+    const res = await axios.post(
+      `${api}/record/room/`,
+      data
+    );
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function toKHR(val) {
   return Number(val).toLocaleString(undefined, { minimumFractionDigits: 0 });
 }
@@ -129,10 +253,10 @@ function toUSD(val) {
   return Number(val).toLocaleString(undefined, { minimumFractionDigits: 2 });
 }
 
-app.get('/', (req, res) => {
-  res.send('Hey there');
-})
+app.get("/", (req, res) => {
+  res.send("Hey there");
+});
 
 app.listen(process.env.PORT || port, () => {
-  console.log('app is listening on port ' + port)
-})
+  console.log("app is listening on port " + port);
+});
