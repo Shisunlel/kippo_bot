@@ -129,6 +129,10 @@ function toUSD(val) {
   return Number(val).toLocaleString(undefined, { minimumFractionDigits: 2 });
 }
 
-app.listen(process.env.PORT || port, () => {
+app.get('/', (req, res) => {
+  res.send('Hey there');
+})
+
+app.listen(env.process.PORT || port, () => {
   console.log('app is listening on port ' + port)
 })
