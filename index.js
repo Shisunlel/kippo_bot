@@ -1,9 +1,12 @@
+const express = require('express')
 const TelegramBot = require("node-telegram-bot-api");
-// const dotenv = require("dotenv");
+const dotenv = require("dotenv");
 const axios = require("axios");
 const dayjs = require("dayjs");
+const app = express()
+const port = 3000
 
-// dotenv.config();
+dotenv.config();
 
 const token = process.env.BOT_TOKEN;
 const youtubeToken = process.env.YOUTUBE_TOKEN;
@@ -125,3 +128,12 @@ function toKHR(val) {
 function toUSD(val) {
   return Number(val).toLocaleString(undefined, { minimumFractionDigits: 2 });
 }
+
+app.get('/', (req, res) => {
+  return res.send('Hello');
+})
+
+
+app.listen(port, () => {
+  console.log('app is listening on port ' + port)
+})
