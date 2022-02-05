@@ -23,10 +23,10 @@ kippo.onText(/\/start/, (msg) => {
     keyboard = [
       ["Process Payment", "Get Latest Payments"],
       ["Get Latest Upload Video", "Get Watch List", "Get Best Anime"],
-      ["Cancel"],
+      ["Contact", "Cancel"],
     ];
   } else {
-    keyboard = [["Process Payment"], ["Cancel"]];
+    keyboard = [["Process Payment"], ["Contact"], ["Cancel"]];
   }
   kippo.sendMessage(msg.chat.id, `What would you like to do?`, {
     reply_markup: {
@@ -47,6 +47,7 @@ kippo.on("message", (msg) => {
     room: /r-\d+/,
     energy: /e-\d+/,
     water: /w-\d+/,
+    contact: /contact/,
     cancel: /cancel/,
   };
   const res = msg.text.toString().toLowerCase().replace(/ /g, "-");
@@ -106,6 +107,16 @@ async function trySwitch(option, res, msg) {
       kippo.sendMessage(
         msg.chat.id,
         `Thank you for choosing our service, ${msg.from?.first_name}!`
+      );
+      break;
+
+    case option.contact.test(res):
+      kippo.sendMessage(
+        msg.chat.id,
+        `You can contact us by through one of these phone numbers\n\n[+85578266598]\n\n[+85598266598]\n\n[+85592422556]`,
+        {
+          parse_mode: "Markdown"
+        }
       );
       break;
 
@@ -207,9 +218,7 @@ async function getRecord() {
 
 async function getLatestRecordByRoom(room_id) {
   try {
-    const res = await axios.get(
-      `${api}/record/room/${room_id}`
-    );
+    const res = await axios.get(`${api}/record/room/${room_id}`);
     return res.data;
   } catch (error) {
     throw error;
@@ -235,10 +244,7 @@ async function getLatestVideo() {
 
 async function createRecord(data) {
   try {
-    const res = await axios.post(
-      `${api}/record/room/`,
-      data
-    );
+    const res = await axios.post(`${api}/record/room/`, data);
     return res.data;
   } catch (error) {
     console.log(error);
