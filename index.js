@@ -53,43 +53,6 @@ kippo.on("message", (msg) => {
   trySwitch(option, res, msg);
 });
 
-async function getRecord() {
-  try {
-    const res = await axios.get(`${api}/record`);
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-async function getLatestRecordByRoom(room_id) {
-  try {
-    const res = await axios.get(
-      `${api}/${room_id}`
-    );
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function getLatestVideo() {
-  const params = {
-    part: "snippet",
-    channelId: "UCO7ByfyndHuYKrauMEbBRVQ",
-    order: "date",
-    type: "video",
-    key: youtubeToken,
-    maxResults: 1,
-  };
-  try {
-    const res = await axios.get(`${youtubeApi}/search`, { params });
-    return res.data;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 async function trySwitch(option, res, msg) {
   switch (true) {
     case option.payments.test(res):
@@ -230,6 +193,43 @@ async function trySwitch(option, res, msg) {
           );
         }
       }
+  }
+}
+
+async function getRecord() {
+  try {
+    const res = await axios.get(`${api}/record`);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function getLatestRecordByRoom(room_id) {
+  try {
+    const res = await axios.get(
+      `${api}/record/room/${room_id}`
+    );
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getLatestVideo() {
+  const params = {
+    part: "snippet",
+    channelId: "UCO7ByfyndHuYKrauMEbBRVQ",
+    order: "date",
+    type: "video",
+    key: youtubeToken,
+    maxResults: 1,
+  };
+  try {
+    const res = await axios.get(`${youtubeApi}/search`, { params });
+    return res.data;
+  } catch (error) {
+    console.error(error);
   }
 }
 
