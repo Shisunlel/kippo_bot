@@ -69,7 +69,7 @@ async function trySwitch(option, res, msg) {
           data.rooms_id
         }\n\nភ្លើង: ${toKHR(data.energy_cost)}៛\n\nទឹក: ${toKHR(
           data.water_cost
-        )}៛\n\nសរុបជាលុយខ្មែរ: ${toKHR(
+        )}៛\n\nអនាម័យ: $1.00\n\nសរុបជាលុយខ្មែរ: ${toKHR(
           data.total_amount_kh
         )}៛\n\nសរុបជាដុល្លារ: $${toUSD(data.total_amount_us)}`;
         if (data.id) {
@@ -115,7 +115,7 @@ async function trySwitch(option, res, msg) {
         msg.chat.id,
         `ទំនាក់ទំនងតាមលេខទូរស័ព្ទខាងក្រោមនេះ\n\n[+85578266598]\n\n[+85598266598]\n\n[+85592422556]`,
         {
-          parse_mode: "Markdown"
+          parse_mode: "Markdown",
         }
       );
       break;
