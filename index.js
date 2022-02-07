@@ -178,24 +178,8 @@ async function trySwitch(option, res, msg) {
           };
           const data = await createRecord(postData);
           if (data) {
-            kippo.sendMediaGroup(msg.chat.id, [
-              {
-                type: "photo",
-                media:
-                  "https://res.cloudinary.com/shisun/image/upload/v1644070857/photo_2022-02-05_21-19-06_p2ycrx.jpg",
-                caption: "ABA: <i>078 266 598</i>\n\nABA: <i>001 132 178</i>",
-                parse_mode: "HTML",
-              },
-              {
-                type: "photo",
-                media:
-                  "https://res.cloudinary.com/shisun/image/upload/v1644072258/photo_2022-02-05_21-43-57_qw5ds9.jpg",
-                caption: "Canadia: <i>006 000 025 7845</i>",
-                parse_mode: "HTML",
-              },
-            ]);
+            sendInvoiceTemplate(kippo, msg);
           }
-          kippo.sendMessage(msg.chat.id, `សូមអរគុណ!`, { parse_mode: "HTML" });
         } else {
           kippo.sendMessage(
             msg.chat.id,
@@ -249,6 +233,31 @@ async function createRecord(data) {
   } catch (error) {
     console.log(error);
   }
+}
+
+function sendInvoiceTemplate(kippo, msg) {
+  kippo.sendMediaGroup(msg.chat.id, [
+    {
+      type: "photo",
+      media:
+        "https://res.cloudinary.com/shisun/image/upload/v1644070857/photo_2022-02-05_21-19-06_p2ycrx.jpg",
+      caption: "ABA: <i>078 266 598</i>\n\nABA: <i>001 132 178</i>",
+      parse_mode: "HTML",
+    },
+    {
+      type: "photo",
+      media:
+        "https://res.cloudinary.com/shisun/image/upload/v1644072258/photo_2022-02-05_21-43-57_qw5ds9.jpg",
+      caption: "Canadia: <i>006 000 025 7845</i>",
+      parse_mode: "HTML",
+    },
+  ]);
+  kippo.sendMessage(
+    msg.chat.id,
+    "[ចុចទីនេះដើម្បីបង់ប្រាក់តាម ABA](https://link.payway.com.kh/aba?id=1261982&code=624159)",
+    { parse_mode: "MarkdownV2" }
+  );
+  kippo.sendMessage(msg.chat.id, `សូមអរគុណ!`, { parse_mode: "HTML" });
 }
 
 function toKHR(val) {
