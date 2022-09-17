@@ -190,8 +190,8 @@ async function trySwitch(option, res, msg) {
         }
       }
       break;
-    case option.payments.test(res):
-      // latest sales
+    case option.due.test(res):
+      // get due
       const dueRooms = getDueRoom();
       if (dueRooms.length) {
         dueRooms.then((data) => {
