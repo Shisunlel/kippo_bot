@@ -21,7 +21,7 @@ kippo.onText(/\/start/, (msg) => {
   let keyboard;
   if (msg.chat.id == myChatId) {
     keyboard = [
-      ["Process Payment", "Get Latest Payments"],
+      ["Process Payment", "Get Latest Payments", "Get Due Room"],
       ["Get Latest Upload Video", "Get Watch List", "Get Best Anime"],
       ["Contact", "Cancel"],
     ];
@@ -49,6 +49,7 @@ kippo.on("message", (msg) => {
     water: /w-\d+/,
     contact: /contact/,
     cancel: /cancel/,
+    due: /get-due-room/,
   };
   const res = msg.text.toString().toLowerCase().replace(/ /g, "-");
   trySwitch(option, res, msg);
@@ -188,6 +189,26 @@ async function trySwitch(option, res, msg) {
           );
         }
       }
+      break;
+    case option.payments.test(res):
+      // latest sales
+      const dueRooms = getDueRoom();
+      if (dueRooms.length) {
+        dueRooms.then((data) => {
+          const mode = "HTML";
+          const title = "បន្ទប់ដល់ថ្ងៃបង់ប្រាក់";
+          const template = `<b>${title}</b>\n\n<i>លេខបន្ទប់</i>\t\t\t<i>ថ្ងៃបង់ប្រាក់</i>\n\n`;
+          data.forEach((e) => {
+            template += `${e.id}\t\t\t\t${e.due_date}\n`;
+          });
+          kippo.sendMessage(msg.chat.id, template, {
+            parse_mode: mode,
+          });
+        });
+      } else {
+        kippo.sendMessage(msg.chat.id, "មិនមានបន្ទប់ដល់ថ្ងៃបង់ប្រាក់");
+      }
+      break;
   }
 }
 
@@ -240,7 +261,7 @@ function sendInvoiceTemplate(kippo, msg) {
     {
       type: "photo",
       media:
-        "https://res.cloudinary.com/shisun/image/upload/v1644070857/photo_2022-02-05_21-19-06_p2ycrx.jpg",
+        "https://res.cloudinary.com/shisun/image/upload/v1663409460/index_y15swm.jpg",
       caption: "ABA: <i>078 266 598</i>\n\nABA: <i>001 132 178</i>",
       parse_mode: "HTML",
     },
@@ -258,6 +279,15 @@ function sendInvoiceTemplate(kippo, msg) {
     { parse_mode: "MarkdownV2" }
   );
   kippo.sendMessage(msg.chat.id, `សូមអរគុណ!`, { parse_mode: "HTML" });
+}
+
+async function getDueRoom() {
+  try {
+    const res = await axios.get(`${api}/due`);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function toKHR(val) {
