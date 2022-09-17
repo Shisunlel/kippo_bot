@@ -192,18 +192,17 @@ async function trySwitch(option, res, msg) {
       break;
     case option.due.test(res):
       // get due
-      const dueRooms = getDueRoom();
+      const dueRooms = await getDueRoom();
       if (dueRooms.length) {
-        dueRooms.then((data) => {
-          const mode = "HTML";
-          const title = "បន្ទប់ដល់ថ្ងៃបង់ប្រាក់";
-          const template = `<b>${title}</b>\n\n<i>លេខបន្ទប់</i>\t\t\t<i>ថ្ងៃបង់ប្រាក់</i>\n\n`;
-          data.forEach((e) => {
-            template += `${e.id}\t\t\t\t${e.due_date}\n`;
-          });
-          kippo.sendMessage(msg.chat.id, template, {
-            parse_mode: mode,
-          });
+        const mode = "HTML";
+        const title = "បន្ទប់ដល់ថ្ងៃបង់ប្រាក់";
+        let template = `<b>${title}</b>\n\n<i>លេខបន្ទប់</i>\t\t\t<i>ថ្ងៃបង់ប្រាក់</i>\n\n<pre>`;
+        dueRooms.forEach((e) => {
+          template += `${e.id}     ${e.due_date}\n`;
+        });
+        template += `</pre>`;
+        kippo.sendMessage(msg.chat.id, template, {
+          parse_mode: mode,
         });
       } else {
         kippo.sendMessage(msg.chat.id, "មិនមានបន្ទប់ដល់ថ្ងៃបង់ប្រាក់");
