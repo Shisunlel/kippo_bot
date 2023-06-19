@@ -274,7 +274,7 @@ function sendInvoiceTemplate(kippo, msg) {
   ]);
   kippo.sendMessage(
     msg.chat.id,
-    "[ចុចទីនេះដើម្បីបង់ប្រាក់តាម ABA](https://link.payway.com.kh/aba?id=1261982&code=624159)",
+    "[ចុចទីនេះដើម្បីបង់ប្រាក់តាម ABA](https://pay.ababank.com/nWd9TRyd2nBhgR1W8)",
     { parse_mode: "MarkdownV2" }
   );
   kippo.sendMessage(msg.chat.id, `សូមអរគុណ!`, { parse_mode: "HTML" });
