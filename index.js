@@ -19,6 +19,7 @@ let room_id, room_data, new_energy, new_water;
 kippo.onText(/\/start/, (msg) => {
   const myChatId = 306355505;
   let keyboard;
+  console.log(msg.chat)
   if (msg.chat.id == myChatId) {
     keyboard = [
       ["Process Payment", "Get Latest Payments", "Get Due Room"],
