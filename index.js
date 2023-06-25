@@ -12,6 +12,7 @@ const token = process.env.BOT_TOKEN;
 const youtubeToken = process.env.YOUTUBE_TOKEN;
 const api = process.env.API;
 const youtubeApi = process.env.YOUTUBE_API;
+const payLink = process.env.PAY_LINK;
 const kippo = new TelegramBot(token, { polling: true });
 
 let room_id, room_data, new_energy, new_water;
@@ -125,7 +126,7 @@ async function trySwitch(option, res, msg) {
     case option.processPayment.test(res):
       kippo.sendMessage(
         msg.chat.id,
-        "តើអ្នកស្នាក់នៅបន្ទប់លេខប៉ុន្មាន?(សូមគោរពតាមឧទាហរណ៍ខាងក្រោម)\n\nex: <b><i>r-10</i></b>",
+        "តើអ្នកស្នាក់នៅបន្ទប់លេខប៉ុន្មាន?(សូមគោរពតាមឧទាហរណ៍ខាងក្រោម)\n\nex: <b>r-10</b>",
         { parse_mode: "HTML" }
       );
       break;
@@ -136,7 +137,7 @@ async function trySwitch(option, res, msg) {
         if (room_data) {
           kippo.sendMessage(
             msg.chat.id,
-            `សូមបញ្ចូលគីឡូភ្លើងខែថ្មី\n\nគីឡូភ្លើងខែចាស់: <b>${room_data.new_energy}\n\n</b>ex: <b><i>e-253</i></b>`,
+            `សូមបញ្ចូលគីឡូភ្លើងខែថ្មី\n\nគីឡូភ្លើងខែចាស់: <b>${room_data.new_energy}\n\n</b>ex: <b>e-253</b>`,
             { parse_mode: "HTML" }
           );
         }
@@ -153,13 +154,13 @@ async function trySwitch(option, res, msg) {
         if (room_data && new_energy >= room_data.new_energy) {
           kippo.sendMessage(
             msg.chat.id,
-            `សូមបញ្ចូលចំនួនទឹកខែថ្មី\n\nលេខទឹកខែចាស់: <b>${room_data.new_water}</b>\n\nex: <b><i>w-21</i></b>`,
+            `សូមបញ្ចូលចំនួនទឹកខែថ្មី\n\nលេខទឹកខែចាស់: <b>${room_data.new_water}</b>\n\nex: <b>w-21</b>`,
             { parse_mode: "HTML" }
           );
         } else {
           kippo.sendMessage(
             msg.chat.id,
-            `សូមបញ្ចូលម្តងទៀត\n\nគីឡូភ្លើងខែចាស់: <b>${room_data.new_energy}</b>\n\nex: <b><i>w-21</i></b>`,
+            `សូមបញ្ចូលម្តងទៀត\n\nគីឡូភ្លើងខែចាស់: <b>${room_data.new_energy}</b>\n\nex: <b>w-21</b>`,
             { parse_mode: "HTML" }
           );
         }
@@ -185,7 +186,7 @@ async function trySwitch(option, res, msg) {
         } else {
           kippo.sendMessage(
             msg.chat.id,
-            `សូមបញ្ចូលម្តងទៀត\n\nលេខទឹកខែចាស់: <b>${room_data.new_water}</b>\n\nex: <b><i>w-21</i></b>`,
+            `សូមបញ្ចូលម្តងទៀត\n\nលេខទឹកខែចាស់: <b>${room_data.new_water}</b>\n\nex: <b>w-21</b>`,
             { parse_mode: "HTML" }
           );
         }
@@ -275,7 +276,7 @@ function sendInvoiceTemplate(kippo, msg) {
   ]);
   kippo.sendMessage(
     msg.chat.id,
-    "[ចុចទីនេះដើម្បីបង់ប្រាក់តាម ABA](https://pay.ababank.com/nWd9TRyd2nBhgR1W8)",
+    `[ចុចទីនេះដើម្បីបង់ប្រាក់តាម ABA](${payLink})`,
     { parse_mode: "MarkdownV2" }
   );
   kippo.sendMessage(msg.chat.id, `សូមអរគុណ!`, { parse_mode: "HTML" });
