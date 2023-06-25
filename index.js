@@ -28,7 +28,7 @@ kippo.onText(/\/start/, (msg) => {
       ["Contact", "Cancel"],
     ];
   } else {
-    keyboard = [["បង់ប្រាក់"], ["លេខទំនាក់ទំនង"], ["ចាកចេញ"]];
+    keyboard = [["Process Payment"], ["Contact"], ["Cancel"]];
   }
   kippo.sendMessage(msg.chat.id, `What would you like to do?`, {
     reply_markup: {
