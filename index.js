@@ -269,8 +269,8 @@ function sendInvoiceTemplate(kippo, msg) {
     {
       type: "photo",
       media:
-        "https://res.cloudinary.com/shisun/image/upload/v1644072258/photo_2022-02-05_21-43-57_qw5ds9.jpg",
-      caption: "Canadia: <i>006 000 025 7845</i>",
+        "https://res.cloudinary.com/shisun/image/upload/v1695738137/photo_2023-09-26_20-33-20_caehip.jpg",
+      caption: "ABA KHR: <i>005 616 502</i>",
       parse_mode: "HTML",
     },
   ]);
